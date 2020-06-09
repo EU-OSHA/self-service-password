@@ -1,4 +1,4 @@
-    <div class="navbar-wrapper">
+    <!--div class="navbar-wrapper">
 
         <div class="navbar navbar-default navbar-static-top" role="navigation">
           <div class="container-fluid">
@@ -51,4 +51,4 @@
           </div>
         </div>
 
-    </div>
+    </div-->
