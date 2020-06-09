@@ -57,7 +57,6 @@ if ( $result === "" && $use_recaptcha ) {
 # Check mail
 #==============================================================================
 if ( $result === "" ) {
-
     # Connect to LDAP
     $ldap = ldap_connect($ldap_url);
     ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -85,7 +84,6 @@ if ( $result === "" ) {
     # Search for user
     $ldap_filter = str_replace("{login}", $login, $ldap_filter);
     $search = ldap_search($ldap, $ldap_base, $ldap_filter);
-
     $errno = ldap_errno($ldap);
     if ( $errno ) {
         $result = "ldaperror";
@@ -184,7 +182,8 @@ if ( $result === "" ) {
             $server_name .= ":".$server_port;
         }
 
-        $reset_url = $method."://".$server_name.$script_name;
+        #$reset_url = $method."://".$server_name.$script_name;
+	$reset_url = "https://oshwiki.eu/self-service-password/";
     }
 
     $reset_url .= "?action=resetbytoken&token=".urlencode($token);
