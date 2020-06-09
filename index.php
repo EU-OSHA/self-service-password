@@ -190,14 +190,13 @@ $mailer->LE            = $mail_newline;
 <?php if (isset($background_image)) { ?>
      <style>
        html, body {
-         background: url("<?php echo $background_image ?>") no-repeat center fixed;
-         background-size: cover;
+         background: url("<?php echo $background_image ?>") no-repeat fixed;
        }
   </style>
 <?php } ?>
 </head>
 <body>
-
+<a style="height: 154px; display: block" href="/"></a>
 <div class="container">
 
 <div class="panel panel-success">
