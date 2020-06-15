@@ -34,12 +34,12 @@ $token = "";
 
 if (!$mail_address_use_ldap) {
     if (isset($_POST["mail"]) and $_POST["mail"]) { $mail = strval($_POST["mail"]); }
-     else { $result = "mailrequired"; }
+    else { $result = "mailrequired"; }
 }
 if (isset($_REQUEST["login"]) and $_REQUEST["login"]) { $login = strval($_REQUEST["login"]); }
- else { $result = "loginrequired"; }
+else { $result = "loginrequired"; }
 if (! isset($_POST["mail"]) and ! isset($_REQUEST["login"]))
- { $result = "emptysendtokenform"; }
+{ $result = "emptysendtokenform"; }
 
 # Check the entered username for characters that our installation doesn't support
 if ( $result === "" ) {
@@ -66,77 +66,77 @@ if ( $result === "" ) {
         error_log("LDAP - Unable to use StartTLS");
     } else {
 
-    # Bind
-    if ( isset($ldap_binddn) && isset($ldap_bindpw) ) {
-        $bind = ldap_bind($ldap, $ldap_binddn, $ldap_bindpw);
-    } else {
-        $bind = ldap_bind($ldap);
-    }
-
-    if ( !$bind ) {
-        $result = "ldaperror";
-        $errno = ldap_errno($ldap);
-        if ( $errno ) {
-            error_log("LDAP - Bind error $errno  (".ldap_error($ldap).")");
-        }
-    } else {
-
-    # Search for user
-    $ldap_filter = str_replace("{login}", $login, $ldap_filter);
-    $search = ldap_search($ldap, $ldap_base, $ldap_filter);
-    $errno = ldap_errno($ldap);
-    if ( $errno ) {
-        $result = "ldaperror";
-        error_log("LDAP - Search error $errno (".ldap_error($ldap).")");
-    } else {
-
-    # Get user DN
-    $entry = ldap_first_entry($ldap, $search);
-    $userdn = ldap_get_dn($ldap, $entry);
-
-    if( !$userdn ) {
-        $result = "badcredentials";
-        error_log("LDAP - User $login not found");
-    } else {
-
-    # Compare mail values
-    $mailValues = ldap_get_values($ldap, $entry, $mail_attribute);
-    unset($mailValues["count"]);
-    $match = 0;
-
-    if (!$mail_address_use_ldap) {
-        # Match with user submitted values
-        foreach ($mailValues as $mailValue) {
-            if (strcasecmp($mail_attribute, "proxyAddresses") == 0) {
-                $mailValue = str_ireplace("smtp:", "", $mailValue);
-            }
-            if (strcasecmp($mail, $mailValue) == 0) {
-                $match = 1;
-            }
-        }
-    } else {
-        # Use first available mail adress in ldap
-        if(count($mailValues) > 0) {
-            $mailValue = $mailValues[0];
-            if (strcasecmp($mail_attribute, "proxyAddresses") == 0) {
-                $mailValue = str_ireplace("smtp:", "", $mailValue);
-            }
-            $mail = $mailValue;
-            $match = true;
-        }
-    }
-
-    if (!$match) {
-        if (!$mail_address_use_ldap) {
-            $result = "mailnomatch";
-            error_log("Mail $mail does not match for user $login");
+        # Bind
+        if ( isset($ldap_binddn) && isset($ldap_bindpw) ) {
+            $bind = ldap_bind($ldap, $ldap_binddn, $ldap_bindpw);
         } else {
-            $result = "mailnomatch";
-            error_log("Mail not found for user $login");
+            $bind = ldap_bind($ldap);
         }
-    }
 
-}}}}}
+        if ( !$bind ) {
+            $result = "ldaperror";
+            $errno = ldap_errno($ldap);
+            if ( $errno ) {
+                error_log("LDAP - Bind error $errno  (".ldap_error($ldap).")");
+            }
+        } else {
+
+            # Search for user
+            $ldap_filter = str_replace("{login}", $login, $ldap_filter);
+            $search = ldap_search($ldap, $ldap_base, $ldap_filter);
+            $errno = ldap_errno($ldap);
+            if ( $errno ) {
+                $result = "ldaperror";
+                error_log("LDAP - Search error $errno (".ldap_error($ldap).")");
+            } else {
+
+                # Get user DN
+                $entry = ldap_first_entry($ldap, $search);
+                $userdn = ldap_get_dn($ldap, $entry);
+
+                if( !$userdn ) {
+                    $result = "badcredentials";
+                    error_log("LDAP - User $login not found");
+                } else {
+
+                    # Compare mail values
+                    $mailValues = ldap_get_values($ldap, $entry, $mail_attribute);
+                    unset($mailValues["count"]);
+                    $match = 0;
+
+                    if (!$mail_address_use_ldap) {
+                        # Match with user submitted values
+                        foreach ($mailValues as $mailValue) {
+                            if (strcasecmp($mail_attribute, "proxyAddresses") == 0) {
+                                $mailValue = str_ireplace("smtp:", "", $mailValue);
+                            }
+                            if (strcasecmp($mail, $mailValue) == 0) {
+                                $match = 1;
+                            }
+                        }
+                    } else {
+                        # Use first available mail adress in ldap
+                        if(count($mailValues) > 0) {
+                            $mailValue = $mailValues[0];
+                            if (strcasecmp($mail_attribute, "proxyAddresses") == 0) {
+                                $mailValue = str_ireplace("smtp:", "", $mailValue);
+                            }
+                            $mail = $mailValue;
+                            $match = true;
+                        }
+                    }
+
+                    if (!$match) {
+                        if (!$mail_address_use_ldap) {
+                            $result = "mailnomatch";
+                            error_log("Mail $mail does not match for user $login");
+                        } else {
+                            $result = "mailnomatch";
+                            error_log("Mail not found for user $login");
+                        }
+                    }
+
+                }}}}}
 
 #==============================================================================
 # Build and store token
@@ -183,7 +183,7 @@ if ( $result === "" ) {
         }
 
         #$reset_url = $method."://".$server_name.$script_name;
-	$reset_url = "https://oshwiki.eu/self-service-password/";
+	    $reset_url = "https://oshwiki.eu/self-service-password/";
     }
 
     $reset_url .= "?action=resetbytoken&token=".urlencode($token);
@@ -210,9 +210,10 @@ if ( $result === "" ) {
 #==============================================================================
 if ( in_array($result, $obscure_failure_messages) ) { $result = "badcredentials"; }
 ?>
-
-<div class="result alert alert-<?php echo get_criticity($result) ?>">
-<p><i class="fa fa-fw <?php echo get_fa_class($result) ?>" aria-hidden="true"></i> <?php echo $messages[$result]; ?></p>
+<div class="mw-ui-vform">
+<div class="<?php echo get_msg_class($result) ?>">
+<p><?php echo $messages[$result]; ?></p>
+</div>
 </div>
 
 <?php if ( $result !== "tokensent" ) { ?>
@@ -230,42 +231,45 @@ if ( $show_help ) {
 }
 ?>
 
-<div class="alert alert-info">
-<form action="#" method="post" class="form-horizontal">
-    <div class="form-group">
-        <label for="login" class="col-sm-4 control-label"><?php echo $messages["login"]; ?></label>
-        <div class="col-sm-8">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                <input type="text" name="login" id="login" value="<?php echo htmlentities($login) ?>" class="form-control" placeholder="<?php echo $messages["login"]; ?>" autocomplete="off" />
+    <div>
+        <form action="#" method="post" class="mw-htmlform-ooui mw-ui-vform">
+            <div class="oo-ui-fieldLayout oo-ui-labelElement">
+                <div class="oo-ui-fieldLayout-body">
+                    <div class="oo-ui-fieldLayout-header">
+                        <label for="login" class="oo-ui-labelElement-label"><?php echo $messages["login"]; ?></label>
+                    </div>
+                    <div class="oo-ui-fieldLayout-field">
+                        <div class="oo-ui-widget oo-ui-widget-enabled oo-ui-inputWidget oo-ui-textInputWidget oo-ui-textInputWidget-type-email oo-ui-textInputWidget-php">
+                            <input type="text" class="oo-ui-inputWidget-input" name="login" id="login" value="<?php echo htmlentities($login) ?>" class="form-control" placeholder="<?php echo $messages["login"]; ?>" autocomplete="off" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <?php if (!$mail_address_use_ldap) { ?>
+        <div class="form-group">
+            <label for="mail" class="col-sm-4 control-label"><?php echo $messages["mail"]; ?></label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-fw fa-envelope-o"></i></span>
+                    <input type="email" name="mail" id="mail" class="form-control" placeholder="<?php echo $messages["mail"]; ?>" autocomplete="off" />
+                </div>
             </div>
         </div>
-    </div>
-<?php if (!$mail_address_use_ldap) { ?>
-    <div class="form-group">
-        <label for="mail" class="col-sm-4 control-label"><?php echo $messages["mail"]; ?></label>
-        <div class="col-sm-8">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-fw fa-envelope-o"></i></span>
-                <input type="email" name="mail" id="mail" class="form-control" placeholder="<?php echo $messages["mail"]; ?>" autocomplete="off" />
+    <?php } ?>
+    <?php if ($use_recaptcha) { ?>
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8">
+                <div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_publickey; ?>" data-theme="<?php echo $recaptcha_theme; ?>" data-type="<?php echo $recaptcha_type; ?>" data-size="<?php echo $recaptcha_size; ?>"></div>
+                <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=<?php echo $lang; ?>"></script>
             </div>
         </div>
-    </div>
-<?php } ?>
-<?php if ($use_recaptcha) { ?>
-    <div class="form-group">
-        <div class="col-sm-offset-4 col-sm-8">
-            <div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_publickey; ?>" data-theme="<?php echo $recaptcha_theme; ?>" data-type="<?php echo $recaptcha_type; ?>" data-size="<?php echo $recaptcha_size; ?>"></div>
-            <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=<?php echo $lang; ?>"></script>
-        </div>
-    </div>
-<?php } ?>
-    <div class="form-group">
-        <div class="col-sm-offset-4 col-sm-8">
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-fw fa-check-square-o"></i> <?php echo $messages['submit']; ?>
+    <?php } ?>
+    <div class="mw-htmlform-submit-buttons">
+        <span class="mw-htmlform-submit oo-ui-widget oo-ui-widget-enabled oo-ui-flaggedElement-primary oo-ui-flaggedElement-progressive oo-ui-inputWidget oo-ui-buttonElement-framed oo-ui-labelElement oo-ui-buttonInputWidget">
+            <button type="submit" class="oo-ui-inputWidget-input oo-ui-buttonElement-button mw-ui-button">
+                <span class="oo-ui-labelElement-label"><?php echo $messages['submit']; ?></span>
             </button>
-        </div>
+        </span>
     </div>
 </form>
 </div>

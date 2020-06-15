@@ -38,7 +38,7 @@ $mail = "";
 $extended_error_msg = "";
 
 if (isset($_REQUEST["token"]) and $_REQUEST["token"]) { $token = strval($_REQUEST["token"]); }
- else { $result = "tokenrequired"; }
+else { $result = "tokenrequired"; }
 
 #==============================================================================
 # Get token
@@ -69,7 +69,7 @@ if ( $result === "" ) {
 
     if ( !$login ) {
         $result = "tokennotvalid";
-	error_log("Unable to open session $tokenid");
+	    error_log("Unable to open session $tokenid");
     } else {
         if (isset($token_lifetime)) {
             # Manage lifetime with session content
@@ -77,7 +77,7 @@ if ( $result === "" ) {
             if ( time() - $tokentime > $token_lifetime ) {
                 $result = "tokennotvalid";
                 error_log("Token lifetime expired");
-	    }
+	        }
         }
     }
 
@@ -89,9 +89,9 @@ if ( $result === "" ) {
 if ( $result === "" ) {
 
     if (isset($_POST["confirmpassword"]) and $_POST["confirmpassword"]) { $confirmpassword = $_POST["confirmpassword"]; }
-     else { $result = "confirmpasswordrequired"; }
+    else { $result = "confirmpasswordrequired"; }
     if (isset($_POST["newpassword"]) and $_POST["newpassword"]) { $newpassword = $_POST["newpassword"]; }
-     else { $result = "newpasswordrequired"; }
+    else { $result = "newpasswordrequired"; }
 }
 
 #==============================================================================
@@ -115,59 +115,59 @@ if ( $result === "" ) {
         error_log("LDAP - Unable to use StartTLS");
     } else {
 
-    # Bind
-    if ( isset($ldap_binddn) && isset($ldap_bindpw) ) {
-        $bind = ldap_bind($ldap, $ldap_binddn, $ldap_bindpw);
-    } else {
-        $bind = ldap_bind($ldap);
-    }
-
-    if ( !$bind ) {
-        $result = "ldaperror";
-        $errno = ldap_errno($ldap);
-        if ( $errno ) {
-            error_log("LDAP - Bind error $errno  (".ldap_error($ldap).")");
+        # Bind
+        if ( isset($ldap_binddn) && isset($ldap_bindpw) ) {
+            $bind = ldap_bind($ldap, $ldap_binddn, $ldap_bindpw);
+        } else {
+            $bind = ldap_bind($ldap);
         }
-    } else {
 
-    # Search for user
-    $ldap_filter = str_replace("{login}", $login, $ldap_filter);
-    $search = ldap_search($ldap, $ldap_base, $ldap_filter);
+        if ( !$bind ) {
+            $result = "ldaperror";
+            $errno = ldap_errno($ldap);
+            if ( $errno ) {
+                error_log("LDAP - Bind error $errno  (".ldap_error($ldap).")");
+            }
+        } else {
 
-    $errno = ldap_errno($ldap);
-    if ( $errno ) {
-        $result = "ldaperror";
-        error_log("LDAP - Search error $errno (".ldap_error($ldap).")");
-    } else {
+            # Search for user
+            $ldap_filter = str_replace("{login}", $login, $ldap_filter);
+            $search = ldap_search($ldap, $ldap_base, $ldap_filter);
 
-    # Get user DN
-    $entry = ldap_first_entry($ldap, $search);
-    $userdn = ldap_get_dn($ldap, $entry);
+            $errno = ldap_errno($ldap);
+            if ( $errno ) {
+                $result = "ldaperror";
+                error_log("LDAP - Search error $errno (".ldap_error($ldap).")");
+            } else {
 
-    if( !$userdn ) {
-        $result = "badcredentials";
-        error_log("LDAP - User $login not found");
-    }
+                # Get user DN
+                $entry = ldap_first_entry($ldap, $search);
+                $userdn = ldap_get_dn($ldap, $entry);
 
-    # Check objectClass to allow samba and shadow updates
-    $ocValues = ldap_get_values($ldap, $entry, 'objectClass');
-    if ( !in_array( 'sambaSamAccount', $ocValues ) and !in_array( 'sambaSAMAccount', $ocValues ) ) {
-        $samba_mode = false;
-    }
-    if ( !in_array( 'shadowAccount', $ocValues ) ) {
-        $shadow_options['update_shadowLastChange'] = false;
-        $shadow_options['update_shadowExpire'] = false;
-    }
+                if( !$userdn ) {
+                    $result = "badcredentials";
+                    error_log("LDAP - User $login not found");
+                }
 
-    # Get user email for notification
-    if ( $notify_on_change ) {
-        $mailValues = ldap_get_values($ldap, $entry, $mail_attribute);
-        if ( $mailValues["count"] > 0 ) {
-            $mail = $mailValues[0];
-        }
-    }
+                # Check objectClass to allow samba and shadow updates
+                $ocValues = ldap_get_values($ldap, $entry, 'objectClass');
+                if ( !in_array( 'sambaSamAccount', $ocValues ) and !in_array( 'sambaSAMAccount', $ocValues ) ) {
+                    $samba_mode = false;
+                }
+                if ( !in_array( 'shadowAccount', $ocValues ) ) {
+                    $shadow_options['update_shadowLastChange'] = false;
+                    $shadow_options['update_shadowExpire'] = false;
+                }
 
-}}}}
+                # Get user email for notification
+                if ( $notify_on_change ) {
+                    $mailValues = ldap_get_values($ldap, $entry, $mail_attribute);
+                    if ( $mailValues["count"] > 0 ) {
+                        $mail = $mailValues[0];
+                    }
+                }
+
+            }}}}
 
 #==============================================================================
 # Check and register new passord
@@ -208,18 +208,20 @@ if ( $result === "passwordchanged" ) {
 if ( in_array($result, $obscure_failure_messages) ) { $result = "badcredentials"; }
 ?>
 
-<div class="result alert alert-<?php echo get_criticity($result) ?>">
-<p><i class="fa fa-fw <?php echo get_fa_class($result) ?>" aria-hidden="true"></i> <?php echo $messages[$result]; ?>
-<?php if ( $show_extended_error and $extended_error_msg ) { ?>
- (<?php echo $extended_error_msg ?>)
-<?php } ?>
-</p>
+<div class="mw-ui-vform">
+    <div class="<?php echo get_msg_class($result) ?>">
+        <p><?php echo $messages[$result]; ?>
+            <?php if ( $show_extended_error and $extended_error_msg ) { ?>
+                (<?php echo $extended_error_msg ?>)
+            <?php } ?>
+        </p>
+    </div>
 </div>
 
 <?php if ( $display_posthook_error and $posthook_return > 0 ) { ?>
 
 <div class="result alert alert-warning">
-<p><i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"></i> <?php echo $posthook_output[0]; ?></p>
+<p><?php echo $posthook_output[0]; ?></p>
 </div>
 
 <?php } ?>
@@ -248,59 +250,61 @@ if ($pwd_show_policy_pos === 'above') {
 }
 ?>
 
-<div class="alert alert-info">
-<form action="#" method="post" class="form-horizontal">
-    <input type="hidden" name="token" value="<?php echo htmlentities($token) ?>" />
-    <div class="form-group">
-        <label for="login" class="col-sm-4 control-label"><?php echo $messages["login"]; ?></label>
-        <div class="col-sm-8">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                <input type="text" name="login" id="login" value="<?php echo htmlentities($login) ?>" class="form-control" placeholder="<?php echo $messages["login"]; ?>" disabled />
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="newpassword" class="col-sm-4 control-label"><?php echo $messages["newpassword"]; ?></label>
-        <div class="col-sm-8">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                <input type="password" name="newpassword" id="newpassword" class="form-control" placeholder="<?php echo $messages["newpassword"]; ?>" />
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="confirmpassword" class="col-sm-4 control-label"><?php echo $messages["confirmpassword"]; ?></label>
-        <div class="col-sm-8">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                <input type="password" name="confirmpassword" id="confirmpassword" class="form-control" placeholder="<?php echo $messages["confirmpassword"]; ?>" />
-            </div>
-        </div>
-    </div>
-<?php if ($use_recaptcha) { ?>
-    <div class="form-group">
-        <div class="col-sm-offset-4 col-sm-8">
-            <div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_publickey; ?>" data-theme="<?php echo $recaptcha_theme; ?>" data-type="<?php echo $recaptcha_type; ?>" data-size="<?php echo $recaptcha_size; ?>"></div>
-            <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=<?php echo $lang; ?>"></script>
-        </div>
-    </div>
-<?php } ?>
-    <div class="form-group">
-        <div class="col-sm-offset-4 col-sm-8">
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-fw fa-check-square-o"></i> <?php echo $messages['submit']; ?>
-            </button>
-        </div>
-    </div>
-</form>
-</div>
+    <form action="#" method="post" class="mw-htmlform-ooui mw-ui-vform">
+        <div class="oo-ui-fieldLayout oo-ui-labelElement oo-ui-layout oo-ui-fieldLayout-align-top">
+            <div class="oo-ui-fieldLayout-body">
+                <div class="mw-ui-vform-field">
+                    <span class="oo-ui-fieldLayout-header">
+                        <label for="login" class="oo-ui-labelElement-label"><?php echo $messages["login"]; ?></label>
+                    </span>
+                    <input type="hidden" name="token" value="<?php echo htmlentities($token) ?>" />
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input type="text" name="login" id="login" value="<?php echo htmlentities($login) ?>" class="mw-ui-input" placeholder="<?php echo $messages["login"]; ?>" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="mw-ui-vform-field">
+                    <span class="oo-ui-fieldLayout-header">
 
-<?php
-if ($pwd_show_policy_pos === 'below') {
-    show_policy($messages, $pwd_policy_config, $result);
-}
-?>
+                        <label for="newpassword" class="col-sm-4 control-label"><?php echo $messages["newpassword"]; ?></label>
+                    </span>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input type="password" name="newpassword" id="newpassword" class="mw-ui-input" placeholder="<?php echo $messages["newpassword"]; ?>" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmpassword" class="col-sm-4 control-label"><?php echo $messages["confirmpassword"]; ?></label>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input type="password" name="confirmpassword" id="confirmpassword" class="mw-ui-input" placeholder="<?php echo $messages["confirmpassword"]; ?>" />
+                        </div>
+                    </div>
+                </div>
+                <?php if ($use_recaptcha) { ?>
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-8">
+                            <div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_publickey; ?>" data-theme="<?php echo $recaptcha_theme; ?>" data-type="<?php echo $recaptcha_type; ?>" data-size="<?php echo $recaptcha_size; ?>"></div>
+                            <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=<?php echo $lang; ?>"></script>
+                        </div>
+                    </div>
+                <?php } ?>
+                <div class="mw-htmlform-submit-buttons">
+                    <button type="submit" class="mw-htmlform-submit mw-ui-button mw-ui-primary mw-ui-progressive">
+                        <?php echo $messages['submit']; ?>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <?php
+    if ($pwd_show_policy_pos === 'below') {
+        show_policy($messages, $pwd_policy_config, $result);
+    }
+    ?>
 
 <?php } ?>
 

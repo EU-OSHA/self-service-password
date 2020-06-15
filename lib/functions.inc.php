@@ -166,6 +166,16 @@ function get_fa_class( $msg) {
 
 }
 
+# OSHA Custom
+function get_msg_class( $msg) {
+    $criticity = get_criticity( $msg );
+
+    if ( $criticity === "danger" ) { return "error"; }
+    if ( $criticity === "warning" ) { return "warning"; }
+    if ( $criticity === "success" ) { return "info"; }
+
+}
+
 # Display policy bloc
 # @return HTML code
 function show_policy( $messages, $pwd_policy_config, $result ) {
