@@ -189,7 +189,9 @@ $mailer->LE            = $mail_newline;
     <link rel="stylesheet" href="/load.php?debug=false&lang=en&modules=ext.addThis|ext.visualEditor.desktopArticleTarget.noscript|mediawiki.htmlform.styles|mediawiki.legacy.commonPrint%2Cshared|mediawiki.sectionAnchor%2Cui|mediawiki.skinning.content.externallinks|mediawiki.skinning.interface|mediawiki.special.userlogin.common.styles|mediawiki.special.userlogin.login.styles|mediawiki.ui.button%2Ccheckbox%2Cinput%2Cradio|skins.osha.styles&only=styles&skin=osha" media="screen" />
 
     <link rel="stylesheet" href="/load.php?debug=false&lang=en&modules=site.styles&only=styles&skin=osha" media="screen"/>
-    
+   <style>
+     #footer { height: 31px; }
+   </style> 
 </head>
 <body class="mediawiki ltr sitedir-ltr mw-hide-empty-elt ns--1 ns-special mw-special-Userlogin page-Special_UserLogin rootpage-Special_UserLogin skin-osha action-view">
     <div id="globalWrapper">
